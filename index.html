@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WaBiz Pro - WhatsApp Business & Marketing</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background: #f0f2f5; min-height: 100vh; }
+        
+        header { background: linear-gradient(135deg, #25D366, #128C7E); color: white; padding: 1.5rem 2rem; position: sticky; top: 0; z-index: 100; }
+        header .top { display: flex; justify-content: space-between; align-items: center; }
+        header h1 { font-size: 1.8rem; }
+        header .tagline { opacity: 0.9; font-size: 0.95rem; }
+        .header-actions { display: flex; gap: 0.5rem; align-items: center; }
+        .upgrade-badge { background: #FFD700; color: #333; padding: 0.4rem 0.8rem; border-radius: 20px; font-weight: 600; font-size: 0.85rem; }
+        
+        main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+        
+        .hero { text-align: center; padding: 2rem 1rem; }
+        .hero h2 { font-size: 2.2rem; margin-bottom: 0.5rem; color: #1a1a1a; }
+        .hero p { color: #666; margin-bottom: 1.5rem; }
+        
+        .nav-tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; background: white; padding: 0.5rem; border-radius: 12px; overflow-x: auto; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .nav-tabs button { padding: 0.8rem 1.5rem; border: none; background: transparent; cursor: pointer; font-weight: 600; border-radius: 8px; white-space: nowrap; }
+        .nav-tabs button.active { background: #25D366; color: white; }
+        
+        .section { display: none; }
+        .section.active { display: block; }
+        
+        .card { background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); margin-bottom: 1.5rem; }
+        .card h3 { margin-bottom: 1rem; color: #1a1a1a; display: flex; align-items: center; gap: 0.5rem; }
+        
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1rem; }
+        .form-group { margin-bottom: 1rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; color: #333; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 0.8rem; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 1rem; }
+        .form-group input:focus, .form-group textarea:focus { outline: none; border-color: #25D366; }
+        
+        .product-list { display: grid; gap: 0.8rem; margin-top: 1rem; }
+        .product-item { display: flex; gap: 0.8rem; align-items: center; padding: 0.8rem; background: #f8f9fa; border-radius: 8px; }
+        .product-item input { flex: 1; padding: 0.6rem; border: 1px solid #ddd; border-radius: 6px; }
+        .product-item .price-input { width: 100px; }
+        .product-item .delete-btn { color: #dc3545; cursor: pointer; font-size: 1.2rem; }
+        
+        .btn { padding: 0.8rem 1.5rem; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background: #25D366; color: white; }
+        .btn-primary:hover { background: #128C7E; }
+        .btn-secondary { background: #6c757d; color: white; }
+        .btn-outline { background: transparent; border: 2px solid #25D366; color: #25D366; }
+        .btn-gold { background: linear-gradient(135deg, #FFD700, #FFA500); color: #333; }
+        
+        .preview-box { background: #e5ddd5; padding: 1.5rem; border-radius: 12px; margin-top: 1.5rem; }
+        .preview-box h4 { color: #333; margin-bottom: 1rem; }
+        
+        .chat-bubble { max-width: 80%; padding: 0.8rem 1rem; border-radius: 12px; margin-bottom: 0.8rem; }
+        .chat-bubble.incoming { background: white; margin-right: auto; border-top-left-radius: 2px; }
+        .chat-bubble.outgoing { background: #dcf8c6; margin-left: auto; border-top-right-radius: 2px; }
+        .chat-bubble strong { font-size: 0.85rem; color: #666; display: block; margin-bottom: 0.3rem; }
+        
+        /* Pricing Plans */
+        .pricing-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 1.5rem; }
+        .pricing-card { border: 3px solid #e0e0e0; border-radius: 16px; padding: 2rem; text-align: center; transition: all 0.3s; position: relative; }
+        .pricing-card.featured { border-color: #25D366; transform: scale(1.02); }
+        .pricing-card.featured::before { content: 'Most Popular'; position: absolute; top: -12px; left: 50%; transform: translateX(-50%); background: #25D366; color: white; padding: 0.3rem 1rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
+        .pricing-card.current { border-color: #FFD700; background: #fffbf0; }
+        .pricing-card .plan-name { font-size: 1.3rem; font-weight: 700; color: #333; }
+        .pricing-card .price { font-size: 2.5rem; font-weight: 800; color: #1a1a1a; margin: 0.5rem 0; }
+        .pricing-card .price span { font-size: 1rem; font-weight: 400; color: #666; }
+        .pricing-card .features { text-align: left; margin: 1.5rem 0; }
+        .pricing-card .features li { padding: 0.5rem 0; color: #555; list-style: none; display: flex; align-items: center; gap: 0.5rem; }
+        .pricing-card .features li::before { content: '✓'; color: #25D366; font-weight: bold; }
+        .pricing-card .features li.disabled { color: #999; }
+        .pricing-card .features li.disabled::before { content: '✗'; color: #999; }
+        
+        /* Payment */
+        .payment-methods { display: flex; gap: 1rem; margin: 1rem 0; flex-wrap: wrap; }
+        .payment-method { padding: 1rem 1.5rem; border: 2px solid #e0e0e0; border-radius: 8px; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 0.5rem; }
+        .payment-method:hover { border-color: #25D366; }
+        .payment-method.selected { border-color: #25D366; background: #f0f9f0; }
+        .payment-method .icon { font-size: 1.5rem; }
+        
+        .momo-form { display: none; margin-top: 1rem; padding: 1.5rem; background: #f8f9fa; border-radius: 8px; }
+        .momo-form.show { display: block; }
+        .momo-form .form-group { max-width: 300px; }
+        
+        .receipt { display: none; margin-top: 1.5rem; padding: 1.5rem; background: #f0f9f0; border-radius: 12px; text-align: center; }
+        .receipt.show { display: block; }
+        .receipt .amount { font-size: 2rem; font-weight: 800; color: #25D366; }
+        .receipt .code { font-size: 1.5rem; font-weight: 700; letter-spacing: 2px; margin: 1rem 0; }
+        
+        /* Subscription Status */
+        .sub-status { background: white; padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+        .sub-status .plan { font-size: 1.2rem; font-weight: 700; }
+        .sub-status .expiry { color: #666; }
+        .sub-status .days-left { color: #ff6b6b; font-weight: 600; }
+        
+        /* Marketing Templates */
+        .template-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+        .template-card { padding: 1.5rem; border: 2px solid #e0e0e0; border-radius: 12px; cursor: pointer; transition: all 0.2s; }
+        .template-card:hover { border-color: #25D366; }
+        .template-card.selected { border-color: #25D366; background: #f0f9f0; }
+        .template-card h4 { color: #1a1a1a; margin-bottom: 0.5rem; }
+        .template-card p { color: #666; font-size: 0.9rem; }
+        .template-card .icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        
+        .audience-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-box { text-align: center; padding: 1rem; background: #f8f9fa; border-radius: 8px; }
+        .stat-box .number { font-size: 1.8rem; font-weight: 700; color: #25D366; }
+        .stat-box .label { font-size: 0.85rem; color: #666; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+        .stat-card { background: linear-gradient(135deg, #25D366, #128C7E); color: white; padding: 1.5rem; border-radius: 12px; text-align: center; }
+        .stat-card .value { font-size: 2rem; font-weight: 700; }
+        .stat-card .label { opacity: 0.9; font-size: 0.9rem; }
+        
+        .order-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        .order-table th, .order-table td { padding: 0.8rem; text-align: left; border-bottom: 1px solid #e0e0e0; }
+        .order-table th { background: #f8f9fa; font-weight: 600; }
+        .order-table tr:hover { background: #f8f9fa; }
+        .status { padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.85rem; }
+        .status.pending { background: #fff3cd; color: #856404; }
+        .status.confirmed { background: #d4edda; color: #155724; }
+        
+        .result-box { padding: 1.5rem; background: #f0f9f0; border-radius: 12px; margin-top: 1.5rem; display: none; }
+        .result-box.show { display: block; }
+        .result-box h4 { color: #128C7E; margin-bottom: 1rem; }
+        .result-box a { display: inline-block; padding: 0.8rem 1.5rem; background: #25D366; color: white; text-decoration: none; border-radius: 8px; }
+        
+        /* WhatsApp Chat Preview */
+        .wa-chat { background: #e5ddd5; border-radius: 12px; padding: 1rem; margin-top: 1rem; }
+        .wa-chat-header { background: #075E54; color: white; padding: 1rem; margin: -1rem -1rem 1rem -1rem; border-radius: 12px 12px 0 0; display: flex; align-items: center; gap: 0.8rem; }
+        .wa-avatar { width: 40px; height: 40px; background: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .wa-message { max-width: 80%; padding: 0.8rem 1rem; border-radius: 12px; margin-bottom: 0.8rem; position: relative; }
+        .wa-message.incoming { background: white; margin-right: auto; border-top-left-radius: 2px; }
+        .wa-message.outgoing { background: #dcf8c6; margin-left: auto; border-top-right-radius: 2px; }
+        .wa-message-time { font-size: 0.7rem; color: #999; position: absolute; bottom: 4px; right: 8px; }
+        .wa-buttons { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem; }
+        .wa-btn { background: #25D366; color: white; padding: 0.6rem 1rem; border-radius: 20px; font-size: 0.85rem; border: none; cursor: pointer; }
+        .wa-btn:hover { background: #128C7E; }
+        
+        /* Interactive Demo */
+        .demo-toggle { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+        .demo-toggle button { padding: 0.5rem 1rem; border: 1px solid #ddd; background: white; border-radius: 20px; cursor: pointer; }
+        .demo-toggle button.active { background: #25D366; color: white; border-color: #25D366; }
+        
+        /* Revenue Analytics */
+        .revenue-card { background: linear-gradient(135deg, #25D366, #128C7E); color: white; padding: 2rem; border-radius: 16px; text-align: center; margin-bottom: 1.5rem; }
+        .revenue-card .label { font-size: 1rem; opacity: 0.9; }
+        .revenue-card .amount { font-size: 3rem; font-weight: 800; margin: 0.5rem 0; }
+        .revenue-card .compare { font-size: 0.9rem; opacity: 0.8; }
+        
+        footer { text-align: center; padding: 2rem; color: #666; }
+        
+        .locked { opacity: 0.6; position: relative; }
+        .locked::after { content: '🔒 Upgrade to unlock'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 1rem 2rem; border-radius: 8px; font-weight: 600; box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="top">
+            <div>
+                <h1>💬 WaBiz Pro</h1>
+                <span class="tagline">WhatsApp Business + Marketing Automation</span>
+            </div>
+            <div class="header-actions">
+                <span class="upgrade-badge">⚡ Pro Plan Active</span>
+            </div>
+        </div>
+    </header>
+    
+    <main>
+        <div class="nav-tabs">
+            <button class="active" onclick="showSection('setup')">🏪 Setup</button>
+            <button onclick="showSection('catalog')">📦 Catalog</button>
+            <button onclick="showSection('marketing')">📢 Marketing</button>
+            <button onclick="showSection('orders')">📋 Orders</button>
+            <button onclick="showSection('analytics')">📊 Analytics</button>
+            <button onclick="showSection('pricing')">💰 Pricing</button>
+        </div>
+        
+        <!-- SETUP SECTION -->
+        <div id="setup" class="section active">
+            <div class="card">
+                <h3>🏪 Business Setup</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Business Name</label>
+                        <input type="text" id="bizName" placeholder="Your Shop Name" value="Abena's Kitchen">
+                    </div>
+                    <div class="form-group">
+                        <label>WhatsApp Number</label>
+                        <input type="tel" id="bizPhone" placeholder="0241234567" value="0241234567">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Welcome Message (Auto-Reply)</label>
+                    <textarea id="welcomeMsg" rows="2">Thanks for contacting Abena's Kitchen! 👋 We deliver Mon-Sat 10am-8pm. What would you like to order?</textarea>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>⚙️ Auto-Reply Keywords</h3>
+                <p style="color: #666; margin-bottom: 1rem;">Set automatic responses for common questions.</p>
+                <div id="keywordList">
+                    <div class="form-group" style="display: flex; gap: 0.5rem;">
+                        <input type="text" placeholder="Keyword (e.g., hours)" value="hours" style="flex: 1;">
+                        <input type="text" placeholder="Response" value="We deliver Mon-Sat, 10am to 8pm" style="flex: 2;">
+                    </div>
+                    <div class="form-group" style="display: flex; gap: 0.5rem;">
+                        <input type="text" placeholder="Keyword (e.g., delivery)" value="delivery" style="flex: 1;">
+                        <input type="text" placeholder="Response" value="Yes! We deliver within Accra. Delivery fee is GH₵20" style="flex: 2;">
+                    </div>
+                </div>
+                <button class="btn btn-outline" onclick="addKeyword()">+ Add Keyword</button>
+            </div>
+        </div>
+        
+        <!-- CATALOG SECTION -->
+        <div id="catalog" class="section">
+            <div class="card">
+                <h3>📦 Product Catalog</h3>
+                <div id="productList" class="product-list">
+                    <div class="product-item">
+                        <input type="text" class="prod-name" placeholder="Product name" value="Jollof Rice & Chicken">
+                        <input type="text" class="prod-price" placeholder="Price" value="GH₵80">
+                        <input type="text" class="prod-desc" placeholder="Description" value="Small portion">
+                        <span class="delete-btn" onclick="this.parentElement.remove()">×</span>
+                    </div>
+                    <div class="product-item">
+                        <input type="text" class="prod-name" placeholder="Product name" value="Banku & Tilapia">
+                        <input type="text" class="prod-price" placeholder="Price" value="GH₵120">
+                        <input type="text" class="prod-desc" placeholder="Description" value="With pepper sauce">
+                        <span class="delete-btn" onclick="this.parentElement.remove()">×</span>
+                    </div>
+                    <div class="product-item">
+                        <input type="text" class="prod-name" placeholder="Product name" value="Fufu with Light Soup">
+                        <input type="text" class="prod-price" placeholder="Price" value="GH₵100">
+                        <input type="text" class="prod-desc" placeholder="Description" value="With goat meat">
+                        <span class="delete-btn" onclick="this.parentElement.remove()">×</span>
+                    </div>
+                </div>
+                <button class="btn btn-outline" onclick="addProduct()">+ Add Product</button>
+                
+                <div style="margin-top: 2rem;">
+                    <button class="btn btn-primary" onclick="generateCatalog()">Generate Catalog</button>
+                    <button class="btn btn-secondary" onclick="testWhatsApp()">Test on WhatsApp</button>
+                </div>
+                
+                <div class="preview-box" id="catalogPreview" style="display: none;">
+                    <h4>📱 WhatsApp Catalog Preview</h4>
+                    <div class="chat-bubble outgoing">
+                        <strong>Customer</strong>
+                        Hi, what do you have?
+                    </div>
+                    <div class="chat-bubble incoming">
+                        <strong>Your Auto-Reply</strong>
+                        <span id="previewWelcome"></span>
+                    </div>
+                    <div class="chat-bubble incoming" style="font-size: 0.9rem;">
+                        <span id="previewCatalog"></span>
+                    </div>
+                </div>
+                
+                <!-- WhatsApp Interactive Demo -->
+                <div class="card" style="margin-top: 1.5rem;">
+                    <h3>💬 WhatsApp Interactive Demo</h3>
+                    <p style="color: #666; margin-bottom: 1rem;">This is what customers see in real WhatsApp with buttons (like Jasper's Market)</p>
+                    
+                    <div class="demo-toggle">
+                        <button class="active" onclick="setDemoMode('list')">📋 Product List</button>
+                        <button onclick="setDemoMode('buttons')">🔘 Buttons</button>
+                        <button onclick="setDemoMode('order')">🛒 Order Flow</button>
+                    </div>
+                    
+                    <div class="wa-chat">
+                        <div class="wa-chat-header">
+                            <div class="wa-avatar">🛒</div>
+                            <div>
+                                <div style="font-weight: 600;">Abena's Kitchen</div>
+                                <div style="font-size: 0.8rem; opacity: 0.8;">Online</div>
+                            </div>
+                        </div>
+                        
+                        <div id="waDemoMessages">
+                            <div class="wa-message incoming">
+                                Welcome to Abena's Kitchen! 👋<br><br>What would you like to do?
+                                <span class="wa-message-time">10:30</span>
+                            </div>
+                            <div class="wa-buttons">
+                                <button class="wa-btn" onclick="demoClick(this)">📋 View Menu</button>
+                                <button class="wa-btn" onclick="demoClick(this)">🛒 My Orders</button>
+                                <button class="wa-btn" onclick="demoClick(this)">📞 Contact Us</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn btn-primary" style="margin-top: 1rem;" onclick="testWhatsApp()">Open in Real WhatsApp</button>
+                </div>
+                
+                <div class="result-box" id="catalogResult">
+                    <h4>✅ Ready to Share!</h4>
+                    <a id="waCatalogLink" href="#" target="_blank">Open WhatsApp Catalog</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- MARKETING SECTION -->
+        <div id="marketing" class="section">
+            <div class="card">
+                <h3>📢 Broadcast Message</h3>
+                <p style="color: #666; margin-bottom: 1rem;">Send promotions to all your customers at once.</p>
+                
+                <div class="audience-stats">
+                    <div class="stat-box">
+                        <div class="number" id="totalCustomers">12</div>
+                        <div class="label">Customers</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number">8</div>
+                        <div class="label">Active (30 days)</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="number">3</div>
+                        <div class="label">New This Week</div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Select Template</label>
+                    <div class="template-grid">
+                        <div class="template-card" onclick="selectTemplate(this, 'promo')">
+                            <div class="icon">🔥</div>
+                            <h4>Flash Sale</h4>
+                            <p>Limited time offer to drive urgency</p>
+                        </div>
+                        <div class="template-card" onclick="selectTemplate(this, 'new')">
+                            <div class="icon">✨</div>
+                            <h4>New Product</h4>
+                            <p>Announce something new</p>
+                        </div>
+                        <div class="template-card" onclick="selectTemplate(this, 'reminder')">
+                            <div class="icon">⏰</div>
+                            <h4>Reminder</h4>
+                            <p>Bring back inactive customers</p>
+                        </div>
+                        <div class="template-card" onclick="selectTemplate(this, 'loyalty')">
+                            <div class="icon">❤️</div>
+                            <h4>Loyalty Reward</h4>
+                            <p>Reward repeat customers</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Message Title</label>
+                    <input type="text" id="msgTitle" placeholder="e.g., 50% Off Today Only!">
+                </div>
+                
+                <div class="form-group">
+                    <label>Your Message</label>
+                    <textarea id="broadcastMsg" rows="4" placeholder="Write your promotional message..."></textarea>
+                </div>
+                
+                <button class="btn btn-primary" onclick="previewBroadcast()">Preview Message</button>
+                <button class="btn btn-primary" style="background: #dc3545;" onclick="sendBroadcast()">Send to All (12 customers)</button>
+                
+                <div class="preview-box" id="broadcastPreview" style="display: none;">
+                    <h4>💬 Message Preview</h4>
+                    <div class="chat-bubble incoming" style="max-width: 95%;">
+                        <span id="finalBroadcast"></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>📅 Scheduled Campaigns</h3>
+                <p style="color: #666; margin-bottom: 1rem;">Plan your marketing in advance. <span style="color: #25D366; font-weight: 600;">PRO feature</span></p>
+                
+                <div class="form-group">
+                    <label>Campaign Name</label>
+                    <input type="text" placeholder="e.g., Friday Special">
+                </div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Date</label>
+                        <input type="date">
+                    </div>
+                    <div class="form-group">
+                        <label>Time</label>
+                        <input type="time">
+                    </div>
+                </div>
+                <button class="btn btn-outline">Schedule Campaign</button>
+            </div>
+        </div>
+        
+        <!-- ORDERS SECTION -->
+        <div id="orders" class="section">
+            <div class="card">
+                <h3>📋 Recent Orders</h3>
+                <table class="order-table">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Items</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="orderTable">
+                        <tr>
+                            <td>#202605041</td>
+                            <td>Kwame A.<br><small>0241234567</small></td>
+                            <td>2x Jollof, 1x Fufu</td>
+                            <td>GH₵260</td>
+                            <td><span class="status confirmed">Confirmed</span></td>
+                        </tr>
+                        <tr>
+                            <td>#202605042</td>
+                            <td>Adjoa B.<br><small>0202345678</small></td>
+                            <td>1x Banku</td>
+                            <td>GH₵120</td>
+                            <td><span class="status pending">Pending</span></td>
+                        </tr>
+                        <tr>
+                            <td>#202605043</td>
+                            <td>Kofi M.<br><small>0273456789</small></td>
+                            <td>3x Fufu</td>
+                            <td>GH₵300</td>
+                            <td><span class="status confirmed">Confirmed</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <!-- ANALYTICS SECTION -->
+        <div id="analytics" class="section">
+            <div class="revenue-card">
+                <div class="label">This Month's Revenue</div>
+                <div class="amount">GH₵12,450</div>
+                <div class="compare">↑ 23% from last month</div>
+            </div>
+            
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="value">47</div>
+                    <div class="label">Total Orders</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">12</div>
+                    <div class="label">Active Customers</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">GH₵265</div>
+                    <div class="label">Avg Order Value</div>
+                </div>
+                <div class="stat-card">
+                    <div class="value">89%</div>
+                    <div class="label">Repeat Rate</div>
+                </div>
+            </div>
+            
+            <div class="card" style="margin-top: 1.5rem;">
+                <h3>📈 Performance</h3>
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem;">
+                    <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #25D366;">+23%</div>
+                        <div style="color: #666;">Orders vs last month</div>
+                    </div>
+                    <div style="padding: 1rem; background: #f8f9fa; border-radius: 8px; text-align: center;">
+                        <div style="font-size: 1.5rem; font-weight: 700; color: #25D366;">+15%</div>
+                        <div style="color: #666;">Revenue vs last month</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- PRICING SECTION -->
+        <div id="pricing" class="section">
+            <div class="card">
+                <h3>💰 Your Subscription</h3>
+                <div class="sub-status">
+                    <div>
+                        <div class="plan">⚡ Pro Plan</div>
+                        <div class="expiry">Renews on June 4, 2026</div>
+                    </div>
+                    <div class="days-left">28 days remaining</div>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>📋 Choose a Plan</h3>
+                <div class="pricing-grid">
+                    <div class="pricing-card">
+                        <div class="plan-name">Free</div>
+                        <div class="price">GH₵0 <span>/month</span></div>
+                        <ul class="features">
+                            <li>5 Products</li>
+                            <li>Basic Auto-Reply</li>
+                            <li class="disabled">Order Capture</li>
+                            <li class="disabled">Broadcasts</li>
+                            <li class="disabled">Analytics</li>
+                            <li class="disabled">Scheduled Campaigns</li>
+                        </ul>
+                        <button class="btn btn-outline" style="width: 100%;">Current Plan</button>
+                    </div>
+                    
+                    <div class="pricing-card featured">
+                        <div class="plan-name">Starter</div>
+                        <div class="price">GH₵150 <span>/month</span></div>
+                        <ul class="features">
+                            <li>20 Products</li>
+                            <li>Keyword Auto-Reply</li>
+                            <li>Order Capture</li>
+                            <li>50 Broadcasts/mo</li>
+                            <li class="disabled">Analytics</li>
+                            <li class="disabled">Scheduled Campaigns</li>
+                        </ul>
+                        <button class="btn btn-primary" style="width: 100%;" onclick="selectPlan('starter')">Current Plan</button>
+                    </div>
+                    
+                    <div class="pricing-card">
+                        <div class="plan-name">Pro</div>
+                        <div class="price">GH₵400 <span>/month</span></div>
+                        <ul class="features">
+                            <li>Unlimited Products</li>
+                            <li>Advanced Auto-Reply</li>
+                            <li>Order Capture + SMS</li>
+                            <li>Unlimited Broadcasts</li>
+                            <li>Full Analytics</li>
+                            <li>Scheduled Campaigns</li>
+                        </ul>
+                        <button class="btn btn-gold" style="width: 100%;" onclick="selectPlan('pro')">Upgrade to Pro</button>
+                    </div>
+                    
+                    <div class="pricing-card">
+                        <div class="plan-name">Enterprise</div>
+                        <div class="price">GH₵1000 <span>/month</span></div>
+                        <ul class="features">
+                            <li>Everything in Pro</li>
+                            <li>Multi-User Access</li>
+                            <li>API Access</li>
+                            <li>Priority Support</li>
+                            <li>Custom Branding</li>
+                            <li>Dedicated Manager</li>
+                        </ul>
+                        <button class="btn btn-outline" style="width: 100%;" onclick="selectPlan('enterprise')">Contact Sales</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card" id="paymentSection" style="display: none;">
+                <h3>💳 Make Payment</h3>
+                <p style="color: #666; margin-bottom: 1rem;">Selected: <strong id="selectedPlanName">Starter</strong> - <strong id="selectedPlanPrice">GH₵150/month</strong></p>
+                
+                <div class="payment-methods">
+                    <div class="payment-method selected" onclick="selectPayment(this, 'momo')">
+                        <span class="icon">📱</span>
+                        <div>
+                            <div style="font-weight: 600;">Mobile Money</div>
+                            <div style="font-size: 0.85rem; color: #666;">MTN, Vodafone, AirtelTigo</div>
+                        </div>
+                    </div>
+                    <div class="payment-method" onclick="selectPayment(this, 'card')">
+                        <span class="icon">💳</span>
+                        <div>
+                            <div style="font-weight: 600;">Card</div>
+                            <div style="font-size: 0.85rem; color: #666;">Visa, Mastercard</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="momo-form show">
+                    <div class="form-group">
+                        <label>Phone Number (Mobile Money)</label>
+                        <input type="tel" id="momoPhone" placeholder="0241234567">
+                    </div>
+                    <button class="btn btn-primary" onclick="processPayment()">Pay GH₵150</button>
+                </div>
+                
+                <div class="receipt" id="paymentReceipt">
+                    <h4>✅ Payment Initiated!</h4>
+                    <p>Send GH₵150 to:</p>
+                    <div class="amount">0241 234 567</div>
+                    <p>Use this reference:</p>
+                    <div class="code">WABIZ-STF</div>
+                    <p style="margin-top: 1rem; font-size: 0.9rem; color: #666;">Confirmation will arrive via SMS within 2 minutes.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    <footer>
+        <p>WaBiz Pro - Built for Ghanaian Businesses 💚</p>
+    </footer>
+    
+    <script>
+        let currentPlan = 'starter';
+        
+        function showSection(id) {
+            document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        function setDemoMode(mode) {
+            document.querySelectorAll('.demo-toggle button').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const container = document.getElementById('waDemoMessages');
+            const demos = {
+                list: `
+                    <div class="wa-message incoming">
+                        🛒 Select a product to order:
+                        <span class="wa-message-time">10:30</span>
+                    </div>
+                    <div class="wa-message incoming" style="padding: 0;">
+                        <div style="padding: 0.5rem; border-bottom: 1px solid #eee;">1. Jollof Rice & Chicken - GH₵80</div>
+                        <div style="padding: 0.5rem; border-bottom: 1px solid #eee;">2. Banku & Tilapia - GH₵120</div>
+                        <div style="padding: 0.5rem;">3. Fufu with Light Soup - GH₵100</div>
+                    </div>
+                    <div class="wa-buttons">
+                        <button class="wa-btn" onclick="demoClick(this)">1</button>
+                        <button class="wa-btn" onclick="demoClick(this)">2</button>
+                        <button class="wa-btn" onclick="demoClick(this)">3</button>
+                    </div>
+                `,
+                buttons: `
+                    <div class="wa-message incoming">
+                        Great choice! <strong>Banku & Tilapia</strong> - GH₵120<br><br>With pepper sauce. Delicious!
+                        <span class="wa-message-time">10:31</span>
+                    </div>
+                    <div class="wa-buttons">
+                        <button class="wa-btn" onclick="demoClick(this)">🛒 Order Now</button>
+                        <button class="wa-btn" onclick="demoClick(this)">📋 More</button>
+                    </div>
+                `,
+                order: `
+                    <div class="wa-message incoming">
+                        ✅ Order Confirmed!<br><br>
+                        <strong>#202605041</strong><br>
+                        1x Banku & Tilapia<br>
+                        Total: GH₵120<br><br>
+                        📍 Delivery: East Legon
+                        <span class="wa-message-time">10:32</span>
+                    </div>
+                    <div class="wa-buttons">
+                        <button class="wa-btn" onclick="demoClick(this)">📍 Track Order</button>
+                        <button class="wa-btn" onclick="demoClick(this)">🔄 Reorder</button>
+                    </div>
+                `
+            };
+            container.innerHTML = demos[mode];
+        }
+        
+        function demoClick(btn) {
+            alert('This would send a message to the business in production!\n\nButton: ' + btn.textContent);
+        }
+        
+        function addProduct() {
+            const div = document.createElement('div');
+            div.className = 'product-item';
+            div.innerHTML = `
+                <input type="text" class="prod-name" placeholder="Product name">
+                <input type="text" class="prod-price" placeholder="Price">
+                <input type="text" class="prod-desc" placeholder="Description">
+                <span class="delete-btn" onclick="this.parentElement.remove()">×</span>
+            `;
+            document.getElementById('productList').appendChild(div);
+        }
+        
+        function addKeyword() {
+            const div = document.createElement('div');
+            div.className = 'form-group';
+            div.style.display = 'flex';
+            div.style.gap = '0.5rem';
+            div.innerHTML = `
+                <input type="text" placeholder="Keyword" style="flex: 1;">
+                <input type="text" placeholder="Response" style="flex: 2;">
+            `;
+            document.getElementById('keywordList').appendChild(div);
+        }
+        
+        function generateCatalog() {
+            const bizName = document.getElementById('bizName').value;
+            const welcomeMsg = document.getElementById('welcomeMsg').value;
+            
+            const products = [];
+            document.querySelectorAll('.product-item').forEach(row => {
+                const name = row.querySelector('.prod-name').value;
+                const price = row.querySelector('.prod-price').value;
+                const desc = row.querySelector('.prod-desc').value;
+                if (name) products.push({ name, price, desc });
+            });
+            
+            document.getElementById('previewWelcome').textContent = welcomeMsg;
+            
+            let catalogText = '\n*Our Menu:*\n';
+            products.forEach((p, i) => {
+                catalogText += `${i + 1}. ${p.name} - ${p.price}`;
+                if (p.desc) catalogText += ` (${p.desc})`;
+                catalogText += '\n';
+            });
+            catalogText += '\n*Reply with number to order!*';
+            
+            document.getElementById('previewCatalog').textContent = catalogText;
+            document.getElementById('catalogPreview').style.display = 'block';
+        }
+        
+        function testWhatsApp() {
+            generateCatalog();
+            
+            const bizName = document.getElementById('bizName').value;
+            const bizPhone = document.getElementById('bizPhone').value;
+            const welcomeMsg = document.getElementById('welcomeMsg').value;
+            
+            const products = [];
+            document.querySelectorAll('.product-item').forEach(row => {
+                const name = row.querySelector('.prod-name').value;
+                const price = row.querySelector('.prod-price').value;
+                const desc = row.querySelector('.prod-desc').value;
+                if (name) products.push({ name, price, desc });
+            });
+            
+            let fullText = `*${bizName}* 🛒\n\n${welcomeMsg}\n\n*Our Menu:*\n`;
+            products.forEach((p, i) => {
+                fullText += `${i + 1}. ${p.name} - ${p.price}`;
+                if (p.desc) fullText += ` (${p.desc})`;
+                fullText += '\n';
+            });
+            fullText += '\nReply with number to order!';
+            
+            const cleanPhone = bizPhone.replace(/\D/g, '');
+            const waLink = `https://wa.me/233${cleanPhone.substring(1)}?text=${encodeURIComponent(fullText)}`;
+            
+            document.getElementById('waCatalogLink').href = waLink;
+            document.getElementById('catalogResult').classList.add('show');
+        }
+        
+        function selectTemplate(el, type) {
+            document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+            el.classList.add('selected');
+            
+            const templates = {
+                promo: "🔥 *FLASH SALE!* 🔥\n\n{product}\n\n🎉 *{discount} OFF!* 🎉\n\nValid for the next {hours} hours only!\n\nDon't miss out - order now!",
+                new: "✨ *NEW ITEM ALERT!* ✨\n\n{product}\n\nBe the first to try our newest creation!\n\nOrder now and let us know what you think!",
+                reminder: "⏰ *We Miss You!* ⏰\n\nIt's been a while since your last order.\n\n{product}\n\nCome back today and get {discount} off!",
+                loyalty: "❤️ *Thank You for Being Special!* ❤️\n\n\nAs one of our loyal customers, you get an exclusive offer:\n\n{product}\n\n🎁 *{discount} OFF* just for you!\n\nValid for 48 hours!"
+            };
+            
+            document.getElementById('broadcastMsg').value = templates[type];
+        }
+        
+        function previewBroadcast() {
+            const msg = document.getElementById('broadcastMsg').value;
+            const title = document.getElementById('msgTitle').value;
+            
+            let finalMsg = title ? `*${title}*\n\n` : '';
+            finalMsg += msg;
+            
+            document.getElementById('finalBroadcast').textContent = finalMsg;
+            document.getElementById('broadcastPreview').style.display = 'block';
+        }
+        
+        function sendBroadcast() {
+            if (confirm('Send this message to all 12 customers?')) {
+                alert('✅ Broadcast sent to 12 customers!');
+            }
+        }
+        
+        function selectPlan(plan) {
+            currentPlan = plan;
+            const prices = { starter: 150, pro: 400, enterprise: 1000 };
+            const names = { starter: 'Starter', pro: 'Pro', enterprise: 'Enterprise' };
+            
+            document.getElementById('selectedPlanName').textContent = names[plan];
+            document.getElementById('selectedPlanPrice').textContent = `GH₵${prices[plan]}/month`;
+            document.getElementById('paymentSection').style.display = 'block';
+            document.getElementById('paymentSection').scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        function selectPayment(el, method) {
+            document.querySelectorAll('.payment-method').forEach(p => p.classList.remove('selected'));
+            el.classList.add('selected');
+            
+            if (method === 'momo') {
+                document.querySelector('.momo-form').classList.add('show');
+            }
+        }
+        
+        function processPayment() {
+            const phone = document.getElementById('momoPhone').value;
+            if (!phone) {
+                alert('Please enter your Mobile Money number');
+                return;
+            }
+            
+            const prices = { starter: 150, pro: 400, enterprise: 1000 };
+            const planPrices = { starter: '150', pro: '400', enterprise: '1000' };
+            
+            document.getElementById('paymentReceipt').classList.add('show');
+            document.getElementById('paymentReceipt').querySelector('.amount').textContent = phone;
+            document.getElementById('paymentReceipt').querySelector('.code').textContent = 'WABIZ-' + Math.random().toString(36).substring(2, 6).toUpperCase();
+        }
+    </script>
+</body>
+</html>
