@@ -4,7 +4,7 @@ WaBiz Pro - WhatsApp Business API Backend
 Integrates with WhatsApp Business Cloud API (Meta)
 """
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_file
 from datetime import datetime
 import json
 import os
@@ -239,6 +239,10 @@ def process_message(business, customer_phone, message_text, message_type=None):
 
 # ==================== FLASK ROUTES ====================
 
+@app.route('/')
+def index():
+    return send_file('index.html')
+
 @app.route('/health')
 def health():
     return jsonify({
@@ -349,6 +353,42 @@ def get_business(phone):
         return jsonify({"error": "Business not found"}), 404
     
     return jsonify(business)
+
+@app.route('/api/catalog/<phone>', methods=['POST'])
+def add_product(phone):
+    """Add a product to business catalog"""
+    data = request.json
+    if not data:
+        return jsonify({"error": "No data provided"}), 400
+    
+    name = data.get('name')
+    price = data.get('price')
+    description = data.get('description', '')
+    category = data.get('category', '')
+    
+    if not name or not price:
+        return jsonify({"error": "Name and price are required"}), 400
+    
+    business = load_business(phone)
+    if not business:
+        return jsonify({"error": "Business not found"}), 404
+    
+    product = {
+        "id": f"prod_{len(business.get('products', [])) + 1}",
+        "name": name,
+        "price": float(price),
+        "currency": data.get('currency', 'USD'),
+        "description": description,
+        "category": category,
+        "created_at": datetime.now().isoformat()
+    }
+    
+    if 'products' not in business:
+        business['products'] = []
+    business['products'].append(product)
+    save_business(phone, business)
+    
+    return jsonify({"success": True, "product": product})
 
 @app.route('/api/catalog/<phone>', methods=['GET'])
 def get_catalog(phone):
