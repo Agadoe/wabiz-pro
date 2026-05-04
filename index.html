@@ -164,7 +164,7 @@
                 <span class="tagline">WhatsApp Business + Marketing Automation</span>
             </div>
             <div class="header-actions">
-                <span class="upgrade-badge">⚡ Pro Plan Active</span>
+                <span class="upgrade-badge">✨ Free Plan</span>
             </div>
         </div>
     </header>
@@ -484,7 +484,7 @@
                 <h3>💰 Your Subscription</h3>
                 <div class="sub-status">
                     <div>
-                        <div class="plan">⚡ Pro Plan</div>
+                        <div class="plan" id="planDisplay">✨ Free Plan</div>
                         <div class="expiry">Renews on June 4, 2026</div>
                     </div>
                     <div class="days-left">28 days remaining</div>
@@ -598,7 +598,7 @@
     </footer>
     
     <script>
-        let currentPlan = 'starter';
+        let currentPlan = 'free';
         
         function showSection(id) {
             document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
@@ -777,7 +777,7 @@
             const prices = { starter: 150, pro: 400, enterprise: 1000 };
             const names = { starter: 'Starter', pro: 'Pro', enterprise: 'Enterprise' };
             
-            document.getElementById('selectedPlanName').textContent = names[plan];
+            document.getElementById('selectedPlanName').textContent = names[plan]; document.getElementById('planDisplay').textContent = names[plan];
             document.getElementById('selectedPlanPrice').textContent = `GH₵${prices[plan]}/month`;
             document.getElementById('paymentSection').style.display = 'block';
             document.getElementById('paymentSection').scrollIntoView({ behavior: 'smooth' });
