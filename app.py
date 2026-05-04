@@ -25,7 +25,7 @@ ACCESS_TOKEN = os.environ.get("WHATSAPP_ACCESS_TOKEN", "")
 PHONE_NUMBER_ID = os.environ.get("PHONE_NUMBER_ID", "")
 
 # Data storage
-DATA_DIR = Path("/home/tedy/.openclaw/workspace/whatsapp-business/data")
+DATA_DIR = Path(os.environ.get('DATA_DIR', '/tmp/wabiz-data'))
 DATA_DIR.mkdir(exist_ok=True)
 
 # ==================== HELPERS ====================
